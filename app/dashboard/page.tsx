@@ -1,12 +1,18 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 import LogoutButton from "@/components/LogoutButton";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import AutomationCard from "@/components/AutomationCard";
 
 export default async function DashboardPage() {
+  async function handleDeleteSuccess() {
+    "use server";
+    revalidatePath("/dashboard");
+  }
+
   const session = await getServerSession(authOptions);
   if (!session) redirect("/");
 
@@ -82,6 +88,7 @@ export default async function DashboardPage() {
                 <AutomationCard 
                   key={auto.id} 
                   automation={auto as any} 
+                  onDeleteSuccess={handleDeleteSuccess}
                 />
               ))
             )}
