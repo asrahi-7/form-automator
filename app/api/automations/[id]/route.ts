@@ -7,10 +7,11 @@ const submissionQueue = new Queue("form-submissions", { connection });
 
 export async function DELETE(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const resolvedParams = await params;
+    const id = resolvedParams.id;
 
     if (!id) {
       return NextResponse.json({ error: "Automation ID required" }, { status: 400 });
@@ -30,7 +31,6 @@ export async function DELETE(
     await prisma.automationAnswer.deleteMany({
       where: { automationId: id },
     });
-
     await prisma.executionLog.deleteMany({
       where: { automationId: id },
     });
