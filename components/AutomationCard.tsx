@@ -1,8 +1,8 @@
-
 "use client";
 
 import React, { useState } from "react";
 import { Trash2, Clock, CheckCircle2, AlertCircle, ExternalLink, Loader2 } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 interface AutomationCardProps {
   automation: {
@@ -15,12 +15,12 @@ interface AutomationCardProps {
       originalUrl: string;
     };
   };
-  onDeleteSuccess: (id: string) => void;
 }
 
-export default function AutomationCard({ automation, onDeleteSuccess }: AutomationCardProps) {
+export default function AutomationCard({ automation }: AutomationCardProps) {
   const [isDeleting, setIsDeleting] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
+  const router = useRouter();
 
   const handleDelete = async () => {
     setIsDeleting(true);
@@ -28,16 +28,17 @@ export default function AutomationCard({ automation, onDeleteSuccess }: Automati
       const res = await fetch(`/api/automations/${automation.id}`, {
         method: "DELETE",
       });
-
       if (res.ok) {
-        onDeleteSuccess(automation.id);
+        setShowConfirm(false);
+        router.refresh(); // Tells Next.js to safely refresh the server data
       } else {
         alert("Failed to delete automation.");
+        setIsDeleting(false);
+        setShowConfirm(false);
       }
     } catch (err) {
       console.error(err);
       alert("Error deleting automation.");
-    } finally {
       setIsDeleting(false);
       setShowConfirm(false);
     }
@@ -104,7 +105,7 @@ export default function AutomationCard({ automation, onDeleteSuccess }: Automati
       {/* Action Footer */}
       <div className="flex items-center justify-between border-t border-slate-100 pt-4 mt-2">
         <span className="text-xs text-slate-400 font-mono">ID: {automation.id.slice(-8)}</span>
-
+        
         {showConfirm ? (
           <div className="flex items-center gap-2 animate-in fade-in slide-in-from-right-2 duration-200">
             <button

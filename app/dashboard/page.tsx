@@ -78,11 +78,10 @@ export default async function DashboardPage() {
             {automations.length === 0 ? (
               <p className="text-gray-500 text-sm">No automations configured yet.</p>
             ) : (
-              automations.map((auto) => (
+             automations.map((auto) => (
                 <AutomationCard 
                   key={auto.id} 
                   automation={auto as any} 
-                  onDeleteSuccess={(id) => console.log('Deleted', id)} 
                 />
               ))
             )}
