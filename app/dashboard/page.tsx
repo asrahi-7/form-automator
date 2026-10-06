@@ -1,18 +1,12 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
-import { revalidatePath } from "next/cache";
 import LogoutButton from "@/components/LogoutButton";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import AutomationCard from "@/components/AutomationCard";
 
 export default async function DashboardPage() {
-  async function handleDeleteSuccess() {
-    "use server";
-    revalidatePath("/dashboard");
-  }
-
   const session = await getServerSession(authOptions);
   if (!session) redirect("/");
 
@@ -82,13 +76,14 @@ export default async function DashboardPage() {
           <h2 className="text-xl font-bold text-gray-900 mb-4">Your Automations</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {automations.length === 0 ? (
-              <p className="text-gray-500 text-sm">No automations configured yet.</p>
+              <p className="text-gray-500 text-sm bg-white p-6 rounded-lg border border-gray-100">
+                No automations configured yet.
+              </p>
             ) : (
-             automations.map((auto) => (
+              automations.map((auto) => (
                 <AutomationCard 
                   key={auto.id} 
                   automation={auto as any} 
-                  onDeleteSuccess={handleDeleteSuccess}
                 />
               ))
             )}
